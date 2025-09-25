@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: instagram_user
+      POSTGRES_PASSWORD: instagram_password
+      POSTGRES_DB: instagram_hub
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U instagram_user -d instagram_hub"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  instagram_hub:
+    build: .
+    environment:
+      DATABASE_URL: postgresql://instagram_user:instagram_password@postgres:5432/instagram_hub
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./:/app
+    working_dir: /app
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+
+volumes:
+  postgres_data:
