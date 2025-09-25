@@ -187,3 +187,4 @@ instagram_manager.py
 ```
 
 This modular structure makes the codebase much more maintainable and allows for easy extension of functionality!
+This modular structure makes the codebase much more maintainable and allows for easy extension of functionality!
