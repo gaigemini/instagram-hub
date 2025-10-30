@@ -15,7 +15,10 @@ logger = logging.getLogger(__name__)
 
 # Database Configuration
 DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://username:password@localhost/instagram_hub")
+WEBHOOK_URL = os.getenv("WEBHOOK_URL")  # Add webhook URL
 logger.info(f"Using database URL: {DATABASE_URL.replace('password', '***')}")
+if WEBHOOK_URL:
+    logger.info(f"Webhook URL configured: {WEBHOOK_URL[:50]}...")
 
 # Create engine with connection pooling and better error handling
 engine = create_engine(
@@ -40,6 +43,18 @@ class InstagramSession(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     is_active = Column(Boolean, default=True)
+
+class WebhookEvent(Base):
+    __tablename__ = "webhook_events"
+    
+    id = Column(String, primary_key=True)  # Unique event ID
+    username = Column(String, nullable=False)  # Instagram account
+    event_type = Column(String, nullable=False)  # message, comment, mention
+    event_data = Column(Text, nullable=False)  # JSON data
+    processed = Column(Boolean, default=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    webhook_sent = Column(Boolean, default=False)
+    webhook_response = Column(Text, nullable=True)
 
 # Add connection event listeners for better error handling
 @event.listens_for(engine, "connect")

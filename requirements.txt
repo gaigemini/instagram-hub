@@ -1,3 +1,4 @@
+# Let pip resolve compatible versions automatically
 fastapi
 uvicorn[standard]
 instagrapi
@@ -5,3 +6,4 @@ sqlalchemy
 psycopg2-binary
 python-multipart
 python-dotenv
+aiohttp
